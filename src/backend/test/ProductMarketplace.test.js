@@ -60,7 +60,7 @@ describe("ProductMarketplace", function () {
         expect(await marketplace.itemCount()).to.equal(1)
         const item = await marketplace.items()
         expect(item.itemId).to.equal(1)
-        expect(item.nft).to.equal(nft.address)
+        expect(item.nft).to.equal(product.address)
         expect(item.tokenId).to.equal(1)
         expect(item.price).to.equal(toWei(1))
         expect(item.sold).to.equal(false)

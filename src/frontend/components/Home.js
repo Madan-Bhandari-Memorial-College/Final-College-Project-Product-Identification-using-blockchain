@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 import { ethers } from "ethers"
 import { Row, Col, Card, Button } from 'react-bootstrap'
+import {  Nav} from 'react-bootstrap'
+import {
+  Link
+} from "react-router-dom";
 
 const Home = ({ marketplace, product }) => {
   const [loading, setLoading] = useState(true)
@@ -22,6 +26,7 @@ const Home = ({ marketplace, product }) => {
         // Add item to items array
         items.push({
           totalPrice,
+          itemCount: i,
           itemId: item.itemId,
           seller: item.seller,
           name: metadata.name,
@@ -54,6 +59,7 @@ const Home = ({ marketplace, product }) => {
           <Row xs={1} md={2} lg={4} className="g-4 py-5">
             {items.map((item, idx) => (
               <Col key={idx} className="overflow-hidden">
+                <Nav.Link as={Link} to={"/product/" + item.itemCount} className='text-dark'>
                 <Card>
                   <Card.Img variant="top" src={item.image} />
                   <Card.Body color="secondary">
@@ -64,12 +70,13 @@ const Home = ({ marketplace, product }) => {
                   </Card.Body>
                   <Card.Footer>
                     <div className='d-grid'>
-                      <Button onClick={() => buyMarketItem(item)} variant="primary" size="lg">
+                      <Button onClick={() => buyMarketItem(item)} variant="dark" size="lg">
                         Buy for {ethers.utils.formatEther(item.totalPrice)} ETH
                       </Button>
                     </div>
                   </Card.Footer>
                 </Card>
+                </Nav.Link>
               </Col>
             ))}
           </Row>

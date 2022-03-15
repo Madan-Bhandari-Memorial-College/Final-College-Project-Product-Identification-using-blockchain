@@ -8,6 +8,7 @@ import MarketplaceAddress from '../contractsData/Marketplace-address.json';
 import ProductAbi from '../contractsData/Product.json'
 import ProductAddress from '../contractsData/PRODUCT-address.json'
 import Navigation from './Navbar';
+import ProductResold from './components/ProductResold';
 import {
   BrowserRouter,
   Routes,
@@ -18,6 +19,8 @@ import Home from './Home';
 import Create from './Create';
 import MyListedItems from './MyListedItems';
 import MyPurchases from './MyPurchases';
+import Dashboard from './Dashboard';
+import ProductDetail from './ProductDetail';
 
  
 function App() {
@@ -57,6 +60,10 @@ function App() {
         <Route path="/create" element={ <Create marketplace={marketplace} product={product} /> }  />
         <Route path="/my-listed-items" element={ <MyListedItems marketplace={marketplace} product={product} account={account} />} />
         <Route path="/my-purchases" element={ <MyPurchases marketplace={marketplace} product={product} account={account} /> } />
+        <Route path="/dashboard" element={ <Dashboard /> } />
+        <Route path="/product/:id" element={ <ProductDetail marketplace={marketplace} product={product} />} />
+        <Route path="/product-resale/:id" element={ <ProductResold marketplace={marketplace} product={product} />} />
+
 
       </Routes>
       )}

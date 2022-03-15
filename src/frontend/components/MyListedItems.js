@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { ethers } from "ethers"
 import { Row, Col, Card } from 'react-bootstrap'
+import Sidebar from './components/Sidebar';
+import styled from "styled-components";
 
 function renderSoldItems(items) {
   return (
@@ -40,6 +42,8 @@ export default function MyListedItems({ marketplace, product, account }) {
         const response = await fetch(uri)
         const metadata = await response.json()
         // get total price of item (item price + fee)
+        console.log("METADATA", metadata)
+
         const totalPrice = await marketplace.getTotalPrice(i.itemId)
         // define listed item object
         let item = {
@@ -48,7 +52,8 @@ export default function MyListedItems({ marketplace, product, account }) {
           itemId: i.itemId,
           name: metadata.name,
           description: metadata.description,
-          image: metadata.image
+          image: metadata.image,
+          product_type: metadata.productType
         }
         listedItems.push(item)
         // Add listed item to sold items array if sold
@@ -63,11 +68,19 @@ export default function MyListedItems({ marketplace, product, account }) {
     loadListedItems()
   }, [])
   if (loading) return (
+    <Wrapper>
+      <Sidebar />
+      <MainContainer>
     <main style={{ padding: "1rem 0" }}>
       <h2>Loading...</h2>
     </main>
+    </MainContainer>
+    </Wrapper>
   )
   return (
+    <Wrapper>
+      <Sidebar />
+      <MainContainer>
     <div className="flex justify-center">
       {listedItems.length > 0 ?
         <div className="px-5 py-3 container">
@@ -77,7 +90,11 @@ export default function MyListedItems({ marketplace, product, account }) {
               <Col key={idx} className="overflow-hidden">
                 <Card>
                   <Card.Img variant="top" src={item.image} />
-                  <Card.Footer>{ethers.utils.formatEther(item.totalPrice)} ETH</Card.Footer>
+                  <Card.Footer className="text-dark">
+                    {item.name}<br />
+                    {item.product_type}<br />
+                    {ethers.utils.formatEther(item.totalPrice)} ETH
+                    </Card.Footer>
                 </Card>
               </Col>
             ))}
@@ -90,5 +107,20 @@ export default function MyListedItems({ marketplace, product, account }) {
           </main>
         )}
     </div>
+    </MainContainer>
+    </Wrapper>
   );
 }
+
+const Wrapper = styled.div`
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #0a0b0d;
+  color: white;
+  overflow: hidden;
+`;
+
+const MainContainer = styled.div`
+  flex: 1;
+`;
