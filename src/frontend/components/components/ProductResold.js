@@ -87,8 +87,9 @@ const ProductResold = ({ marketplace, product }) => {
     await (await product.setApprovalForAll(marketplace.address, true)).wait();
     // add Product to marketplace
     const listingPrice = ethers.utils.parseEther(price.toString());
+    const currentDateTime = Math.round(new Date().getTime()/1000);
     await (
-      await marketplace.makeItem(nft, id, listingPrice)
+      await marketplace.makeItem(nft, id, listingPrice, currentDateTime)
     ).wait();
   };
 
@@ -183,7 +184,7 @@ const ProductResold = ({ marketplace, product }) => {
               <div className="content mx-auto">
                   <Card className="p-4">
                 <Row className="g-4">
-                  <img src={items[0].image} height="100px" />
+                  <img src={items[0].image} height="200px" />
                   <label className="text-dark">Name</label>
                   <Form.Control
                     onChange={(e) => setName(e.target.value)}
@@ -191,7 +192,7 @@ const ProductResold = ({ marketplace, product }) => {
                     required
                     type="text"
                     placeholder="Name"
-                    value={items[0].name}
+                    currentValue={items[0].name}
                   />
                   <label className="text-dark">Type of Product</label>
 
@@ -209,7 +210,7 @@ const ProductResold = ({ marketplace, product }) => {
                     required
                     as="textarea"
                     placeholder="Description"
-                    value={items[0].description}
+                    currentValue={items[0].description}
                   />
                   <label className="text-dark">Price</label>
 

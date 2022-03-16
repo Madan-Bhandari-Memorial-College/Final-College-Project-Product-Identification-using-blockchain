@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ethers } from "ethers";
-import { Row, Form, Button, Col } from "react-bootstrap";
+import { Row, Form, Button, Col, Card } from "react-bootstrap";
 import { create as ipfsHttpClient } from "ipfs-http-client";
 import Sidebar from "./components/Sidebar";
 import styled from "styled-components";
@@ -12,6 +12,8 @@ const Create = ({ marketplace, product }) => {
   const [price, setPrice] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [purchaseDate, setPurchaseDate] = useState("");
+
   const [productType, setProductType] = useState("");
   const [vehicleNo, setVehicleNo] = useState("");
   const [lotNo, setLotNo] = useState("");
@@ -35,7 +37,7 @@ const Create = ({ marketplace, product }) => {
     if (!image || !price || !name || !description) return;
     try {
       const result = await client.add(
-        JSON.stringify({ image, price, name, description, productType, vehicleNo, lotNo, deviceIdentificationNumber, propertyVerificationNumber })
+        JSON.stringify({ image, price, name, description, productType, vehicleNo, lotNo, deviceIdentificationNumber, propertyVerificationNumber, purchaseDate })
       );
       mintThenList(result);
     } catch (error) {
@@ -52,8 +54,10 @@ const Create = ({ marketplace, product }) => {
     await (await product.setApprovalForAll(marketplace.address, true)).wait();
     // add Product to marketplace
     const listingPrice = ethers.utils.parseEther(price.toString());
+    const currentDateTime = Math.round(new Date().getTime()/1000);
+    console.log(currentDateTime)
     await (
-      await marketplace.makeItem(product.address, id, listingPrice)
+      await marketplace.makeItem(product.address, id, listingPrice, currentDateTime)
     ).wait();
   };
 
@@ -72,7 +76,7 @@ const Create = ({ marketplace, product }) => {
               size="lg"
               required
               type="text"
-              placeholder="Lot No."
+              placeholder="Engine Number"
             /></Col>
             <Col>
             <Form.Control
@@ -80,7 +84,7 @@ const Create = ({ marketplace, product }) => {
               size="lg"
               required
               type="text"
-              placeholder="Vehicle No."
+              placeholder="Chasis Number"
             />
             </Col>
             </Row>
@@ -111,6 +115,9 @@ const Create = ({ marketplace, product }) => {
           type="text"
           placeholder="Property verification Number"
         /></Col>
+        <Col>
+        <Button className="primary">Verify</Button>
+        </Col>
         
         </Row>
       </div>);
@@ -130,13 +137,17 @@ const Create = ({ marketplace, product }) => {
               style={{ maxWidth: "1000px" }}
             >
               <div className="content mx-auto">
+              <Card className="p-4">
+
                 <Row className="g-4">
+                  <label className="text-dark">File</label>
                   <Form.Control
                     type="file"
                     required
                     name="file"
                     onChange={uploadToIPFS}
                   />
+                  <label className="text-dark">Name</label>
                   <Form.Control
                     onChange={(e) => setName(e.target.value)}
                     size="lg"
@@ -144,6 +155,8 @@ const Create = ({ marketplace, product }) => {
                     type="text"
                     placeholder="Name"
                   />
+                  <label className="text-dark">Product Type</label>
+
                   <Form.Select
                     value={productType}
                     onChange={handleProductTypeChange}
@@ -157,6 +170,16 @@ const Create = ({ marketplace, product }) => {
                     <option value="real_estate">Real Estate Property</option>
                   </Form.Select>
                   {renderSelectedForm(productType)}
+                  <label className="text-dark">Purchase Date</label>
+                  <Form.Control
+                    onChange={(e) => setPurchaseDate(e.target.value)}
+                    size="lg"
+                    required
+                    type="date"
+                    placeholder="purchaseDate"
+                  />
+                  <label className="text-dark">Description</label>
+
                   <Form.Control
                     onChange={(e) => setDescription(e.target.value)}
                     size="lg"
@@ -164,6 +187,8 @@ const Create = ({ marketplace, product }) => {
                     as="textarea"
                     placeholder="Description"
                   />
+                  <label className="text-dark">Price</label>
+
                   <Form.Control
                     onChange={(e) => setPrice(e.target.value)}
                     size="lg"
@@ -177,6 +202,8 @@ const Create = ({ marketplace, product }) => {
                     </Button>
                   </div>
                 </Row>
+                </Card>
+
               </div>
             </main>
           </div>

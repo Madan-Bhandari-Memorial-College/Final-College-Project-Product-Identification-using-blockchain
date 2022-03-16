@@ -13,7 +13,7 @@ function renderSoldItems(items) {
           <Col key={idx} className="overflow-hidden">
             <Card>
               <Card.Img variant="top" src={item.image} />
-              <Card.Footer>
+              <Card.Footer className="text-dark">
                 For {ethers.utils.formatEther(item.totalPrice)} ETH - Recieved {ethers.utils.formatEther(item.price)} ETH
               </Card.Footer>
             </Card>

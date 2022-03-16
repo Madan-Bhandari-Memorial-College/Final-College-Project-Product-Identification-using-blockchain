@@ -11,11 +11,12 @@ const ProductDetail = ({ marketplace, product }) => {
   const { id } = useParams();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [offers, setOffers] = useState([])
+  const [boughts, setBoughts] = useState([])
 
   const loadMarketplaceItems = async () => {
     // Load all unsold items
     let items = [];
-
     //   if (i.toString() == id) {
         const item = await marketplace.items(id);
         if (!item.sold) {
@@ -28,6 +29,57 @@ const ProductDetail = ({ marketplace, product }) => {
           console.log(item.nft)
           // get total price of item (item price + fee)
           const totalPrice = await marketplace.getTotalPrice(item.itemId);
+          console.log(item.offeredDateTime);
+          const filter =  marketplace.filters.Offered(null, item.nft, null, null, null, null)
+          const boughtFilter =  marketplace.filters.Bought(null, item.nft, null, null, null, null, null)
+          const boughtResults = await marketplace.queryFilter(boughtFilter);
+          const boughts = await Promise.all(boughtResults.map(async i => {
+            
+            // fetch arguments from each result
+            i = i.args
+            console.log("args", i)
+            // get uri url from product contract
+            const uri = await product.tokenURI(i.tokenId)
+            // use uri to fetch the product metadata stored on ipfs 
+            const response = await fetch(uri)
+            const metadata = await response.json()
+            // get total price of item (item price + fee)
+            const totalPrice = await marketplace.getTotalPrice(i.itemId)
+            // define listed item object
+            let boughtItem = {
+              id: ethers.utils.formatEther(i.itemId),
+              totalPrice,
+              boughtDateTime: Date(i.boughtDateTime*1000),
+              buyer: i.buyer,
+              seller: i.seller
+            }
+            return boughtItem
+          }))
+          setBoughts(boughts);
+          const results = await marketplace.queryFilter(filter)
+          const offers = await Promise.all(results.map(async i => {
+            
+            // fetch arguments from each result
+            i = i.args
+            // console.log("args", i)
+            // get uri url from product contract
+            const uri = await product.tokenURI(i.tokenId)
+            // use uri to fetch the product metadata stored on ipfs 
+            const response = await fetch(uri)
+            const metadata = await response.json()
+            // get total price of item (item price + fee)
+            const totalPrice = await marketplace.getTotalPrice(i.itemId)
+            // define listed item object
+            let purchasedItem = {
+              id: ethers.utils.formatEther(i.itemId),
+              offeredDateTime: Date(i.offeredDateTime * 1000),
+              seller: i.seller,
+              totalPrice
+            }
+            return purchasedItem
+          }))
+          setOffers(offers);
+          console.log("nft", item.nft);
           // Add item to items array
           items.push({
             totalPrice,
@@ -37,11 +89,13 @@ const ProductDetail = ({ marketplace, product }) => {
             name: metadata.name,
             description: metadata.description,
             image: metadata.image,
-            deviceIdentificationNumber: metadata.deviceIdentificationNumber
+            offeredDateTime: item.offeredDateTime,
+            deviceIdentificationNumber: metadata.deviceIdentificationNumber,
+            purchaseDate: metadata.purchaseDate
           });
         }
       setItems(items);
-
+      console.log(offers)
     //   }
       setLoading(false);
     
@@ -58,7 +112,11 @@ const ProductDetail = ({ marketplace, product }) => {
     );
 
     const buyMarketItem = async (item) => {
-        await (await marketplace.purchaseItem(item.itemId, { value: item.totalPrice })).wait()
+    const currentDateTime = Math.round(new Date().getTime()/1000);
+        
+        await (await marketplace.purchaseItem(item.itemId, currentDateTime, { value: item.totalPrice })).wait()
+        console.log("call2")
+
         loadMarketplaceItems()
       }
 
@@ -78,6 +136,8 @@ const ProductDetail = ({ marketplace, product }) => {
               <Brand>{item.productType}</Brand>
               <h2>{item.name}</h2>
               <Price>
+                <strong>Purchased On: </strong>{item.purchaseDate}
+                <br/>
                 <strong>Price:</strong> {ethers.utils.formatEther(item.totalPrice)} ETH
               </Price>
               <p>
@@ -102,7 +162,7 @@ const ProductDetail = ({ marketplace, product }) => {
         <hr />
       </Container>
       <Container>
-        <StickyHeadTable />
+        <StickyHeadTable offers={offers} boughts={boughts} id={id} />
       </Container></> ):(
           <main style={{ padding: "1rem 0" }}>
             <h2>Not found</h2>
@@ -128,6 +188,7 @@ const ImgandDes = styled.div`
   padding: 20px;
 `;
 const ProductDes = styled.p`
+  margin-top: 20px;
   overflow: scroll;
   border-radius: 10px;
   border: 1px solid #c2c2c2;
@@ -136,6 +197,7 @@ const ProductDes = styled.p`
   -moz-box-shadow: 1px 3px 14px -6px rgba(120, 120, 120, 1);
 `;
 const ProductImage = styled.img`
+  min-height: 300px;
   width: 100%;
   height: 95%;
   border-radius: 10px;

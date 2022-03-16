@@ -40,7 +40,9 @@ const Home = ({ marketplace, product }) => {
   }
 
   const buyMarketItem = async (item) => {
-    await (await marketplace.purchaseItem(item.itemId, { value: item.totalPrice })).wait()
+    const currentDateTime = Math.round(new Date().getTime()/1000);
+
+    await (await marketplace.purchaseItem(item.itemId, currentDateTime, { value: item.totalPrice })).wait()
     loadMarketplaceItems()
   }
 
@@ -59,8 +61,9 @@ const Home = ({ marketplace, product }) => {
           <Row xs={1} md={2} lg={4} className="g-4 py-5">
             {items.map((item, idx) => (
               <Col key={idx} className="overflow-hidden">
-                <Nav.Link as={Link} to={"/product/" + item.itemCount} className='text-dark'>
                 <Card>
+                <Nav.Link as={Link} to={"/product/" + item.itemCount} className='text-dark'>
+
                   <Card.Img variant="top" src={item.image} />
                   <Card.Body color="secondary">
                     <Card.Title>{item.name}</Card.Title>
@@ -68,6 +71,8 @@ const Home = ({ marketplace, product }) => {
                       {item.description}
                     </Card.Text>
                   </Card.Body>
+                </Nav.Link>
+
                   <Card.Footer>
                     <div className='d-grid'>
                       <Button onClick={() => buyMarketItem(item)} variant="dark" size="lg">
@@ -76,7 +81,6 @@ const Home = ({ marketplace, product }) => {
                     </div>
                   </Card.Footer>
                 </Card>
-                </Nav.Link>
               </Col>
             ))}
           </Row>

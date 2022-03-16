@@ -20,11 +20,12 @@ contract Marketplace is ReentrancyGuard {
     }
 
     event Offered(
-        uint itemId,
+        uint indexed itemId,
         address indexed nft,
         uint tokenId,
         uint price,
-        address indexed seller
+        address indexed seller,
+        uint256 offeredDateTime
     );
 
     event Bought (
@@ -33,7 +34,8 @@ contract Marketplace is ReentrancyGuard {
         uint tokenId,
         uint price,
         address indexed seller,
-        address indexed buyer
+        address indexed buyer,
+        uint256 boughtDateTime
     );
 
     mapping(uint =>  Item) public items;
@@ -46,7 +48,7 @@ contract Marketplace is ReentrancyGuard {
 
     // make 
 
-    function makeItem(IERC721 _nft, uint _tokenId, uint _price) external nonReentrant {
+    function makeItem(IERC721 _nft, uint _tokenId, uint _price, uint256 offeredDateTime) external nonReentrant {
         require(_price > 0, "Price must be greater than zero");
         itemCount ++;
         _nft.transferFrom(msg.sender, address(this), _tokenId);
@@ -60,11 +62,11 @@ contract Marketplace is ReentrancyGuard {
             false
         );
 
-        emit Offered(itemCount, address(_nft), _tokenId, _price, msg.sender);
+        emit Offered(itemCount, address(_nft), _tokenId, _price, msg.sender, offeredDateTime);
 
     }
 
-    function purchaseItem(uint _itemId) external payable nonReentrant {
+    function purchaseItem(uint _itemId, uint256 boughtDateTime) external payable nonReentrant {
         uint _totalPrice = getTotalPrice(_itemId);
         Item storage item = items[_itemId];
         require(_itemId > 0 && _itemId <= itemCount, "item doesn't exists");
@@ -80,7 +82,8 @@ contract Marketplace is ReentrancyGuard {
             item.tokenId,
             item.price,
             item.seller,
-            msg.sender
+            msg.sender,
+            boughtDateTime
         );
     }
 
