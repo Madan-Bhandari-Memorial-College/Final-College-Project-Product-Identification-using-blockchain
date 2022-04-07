@@ -1,8 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 
-const Portfolio = () => {
-    
+const Portfolio = ({ balance }) => {
+
   return (
     <Wrapper>
       <Content>
@@ -11,8 +11,7 @@ const Portfolio = () => {
             <Balance>
               <BalanceTitle>Portfolio balance</BalanceTitle>
               <BalanceValue>
-                {"$"}
-                46,000
+                {balance} ETH
               </BalanceValue>
             </Balance>
           </div>

@@ -1,16 +1,22 @@
 import Main from "./components/Main";
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
+import Web3 from 'web3';
 
-const Dashboard = ({ address }) => {
+
+const Dashboard = ({ address, account }) => {
+  const [balance, setBalance] = useState(0);
+  let web3 = new Web3(window.ethereum);
+  web3.eth.getBalance(account).then((value) => setBalance(web3.utils.fromWei(value, 'ether')));
+
   return (
     <Wrapper>
       <Sidebar />
       <MainContainer>
         {/* <Header walletAddress={address} /> */}
-        <Main />
+        <Main balance={balance} />
       </MainContainer>
     </Wrapper>
   );

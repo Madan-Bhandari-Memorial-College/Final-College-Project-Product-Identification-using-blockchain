@@ -2,10 +2,10 @@ import React from "react";
 import styled from "styled-components";
 import Portfolio from "./Portfolio";
 
-const Main = () => {
+const Main = ({ balance }) => {
   return (
     <Wrapper>
-      <Portfolio />
+      <Portfolio balance={balance} />
     </Wrapper>
   );
 };

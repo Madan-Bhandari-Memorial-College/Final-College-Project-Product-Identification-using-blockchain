@@ -23,8 +23,8 @@ const ProductResold = ({ marketplace, product }) => {
 
     //   if (i.toString() == id) {
     const item = await marketplace.items(id);
-    
-      // get uri url from product contract
+
+    // get uri url from product contract
     const uri = await product.tokenURI(item.tokenId);
     console.log(product.addrress);
     // use uri to fetch the product metadata stored on ipfs
@@ -35,22 +35,23 @@ const ProductResold = ({ marketplace, product }) => {
     const totalPrice = await marketplace.getTotalPrice(item.itemId);
     // Add item to items array
     items.push({
-    totalPrice,
-    itemCount: id,
-    itemId: item.itemId,
-    seller: item.seller,
-    name: metadata.name,
-    nft: item.nft,
-    description: metadata.description,
-    image: metadata.image,
-    deviceIdentificationNumber: metadata.deviceIdentificationNumber,
-    lotNo: metadata.lotNo,
-    vehicleNo: metadata.vehicleNo,
-    propertyVerificationNumber: metadata.propertyVerificationNumber,
-    deviceIdentificationNumber: metadata.deviceIdentificationNumber,
-    productType: metadata.productType
+      totalPrice,
+      itemCount: id,
+      itemId: item.itemId,
+      seller: item.seller,
+      name: metadata.name,
+      nft: item.nft,
+      tokenId: item.tokenId,
+      description: metadata.description,
+      image: metadata.image,
+      deviceIdentificationNumber: metadata.deviceIdentificationNumber,
+      lotNo: metadata.lotNo,
+      vehicleNo: metadata.vehicleNo,
+      propertyVerificationNumber: metadata.propertyVerificationNumber,
+      deviceIdentificationNumber: metadata.deviceIdentificationNumber,
+      productType: metadata.productType
     });
-    
+
     setItems(items);
     setDescription(items[0].description)
     setName(items[0].name)
@@ -82,12 +83,12 @@ const ProductResold = ({ marketplace, product }) => {
     // mint Product
     await (await product.mint(uri)).wait();
     // get tokenId of new Product
-    const id = await product.tokenCount();
+    const id = items[0].tokenId;
     // approve marketplace to spend Product
     await (await product.setApprovalForAll(marketplace.address, true)).wait();
     // add Product to marketplace
     const listingPrice = ethers.utils.parseEther(price.toString());
-    const currentDateTime = Math.round(new Date().getTime()/1000);
+    const currentDateTime = Math.round(new Date().getTime() / 1000);
     await (
       await marketplace.makeItem(nft, id, listingPrice, currentDateTime)
     ).wait();
@@ -99,27 +100,27 @@ const ProductResold = ({ marketplace, product }) => {
         return (
           <div>
             <Row>
-            <label className="text-dark">Lot No</label>
-            <Col><Form.Control
-              size="lg"
-              required
-              type="text"
-              placeholder="Lot No."
-              value={items[0].lotNo}
-              disabled
-            /></Col>
-            <Col>
-            <label className="text-dark">Vehicle No</label>
+              <label className="text-dark">Lot No</label>
+              <Col><Form.Control
+                size="lg"
+                required
+                type="text"
+                placeholder="Lot No."
+                value={items[0].lotNo}
+                disabled
+              /></Col>
+              <Col>
+                <label className="text-dark">Vehicle No</label>
 
-            <Form.Control
-              size="lg"
-              required
-              type="text"
-              placeholder="Vehicle No."
-              value={items[0].vehicleNo}
-              disabled
-            />
-            </Col>
+                <Form.Control
+                  size="lg"
+                  required
+                  type="text"
+                  placeholder="Vehicle No."
+                  value={items[0].vehicleNo}
+                  disabled
+                />
+              </Col>
             </Row>
           </div>
         );
@@ -127,34 +128,34 @@ const ProductResold = ({ marketplace, product }) => {
         return (
           <div>
             <Row>
-            <label className="text-dark">Device Identification Number</label>
-            <Col><Form.Control
-              size="lg"
-              required
-              type="text"
-              placeholder="Device Identification Number(such as: IMEI)"
-              value={items[0].deviceIdentificationNumber}
-              disabled
-            /></Col>
-            
+              <label className="text-dark">Device Identification Number</label>
+              <Col><Form.Control
+                size="lg"
+                required
+                type="text"
+                placeholder="Device Identification Number(such as: IMEI)"
+                value={items[0].deviceIdentificationNumber}
+                disabled
+              /></Col>
+
             </Row>
           </div>
         );;
       case "real_estate":
         return (<div>
-        <Row>
-        <label className="text-dark">Property Verification Number</label>
-        <Col><Form.Control
-          size="lg"
-          required
-          type="text"
-          placeholder="Property verification Number"
-          value={items[0].propertyVerificationNumber}
-          disabled
-        /></Col>
-        
-        </Row>
-      </div>);
+          <Row>
+            <label className="text-dark">Property Verification Number</label>
+            <Col><Form.Control
+              size="lg"
+              required
+              type="text"
+              placeholder="Property verification Number"
+              value={items[0].propertyVerificationNumber}
+              disabled
+            /></Col>
+
+          </Row>
+        </div>);
       default:
         return null;
     }
@@ -182,52 +183,52 @@ const ProductResold = ({ marketplace, product }) => {
               style={{ maxWidth: "1000px" }}
             >
               <div className="content mx-auto">
-                  <Card className="p-4">
-                <Row className="g-4">
-                  <img src={items[0].image} height="200px" />
-                  <label className="text-dark">Name</label>
-                  <Form.Control
-                    onChange={(e) => setName(e.target.value)}
-                    size="lg"
-                    required
-                    type="text"
-                    placeholder="Name"
-                    currentValue={items[0].name}
-                  />
-                  <label className="text-dark">Type of Product</label>
+                <Card className="p-4">
+                  <Row className="g-4">
+                    <img src={items[0].image} height="200px" />
+                    <label className="text-dark">Name</label>
+                    <Form.Control
+                      onChange={(e) => setName(e.target.value)}
+                      size="lg"
+                      required
+                      type="text"
+                      placeholder="Name"
+                      currentValue={items[0].name}
+                    />
+                    <label className="text-dark">Type of Product</label>
 
-                  <Form.Control
-                    value={items[0].productType}
-                    aria-label="Default select example"
-                    disabled
-                  />
-                  {renderSelectedForm(items[0].productType)}
-                  <label className="text-dark">Description</label>
+                    <Form.Control
+                      value={items[0].productType}
+                      aria-label="Default select example"
+                      disabled
+                    />
+                    {renderSelectedForm(items[0].productType)}
+                    <label className="text-dark">Description</label>
 
-                  <Form.Control
-                    onChange={(e) => setDescription(e.target.value)}
-                    size="lg"
-                    required
-                    as="textarea"
-                    placeholder="Description"
-                    currentValue={items[0].description}
-                  />
-                  <label className="text-dark">Price</label>
+                    <Form.Control
+                      onChange={(e) => setDescription(e.target.value)}
+                      size="lg"
+                      required
+                      as="textarea"
+                      placeholder="Description"
+                      currentValue={items[0].description}
+                    />
+                    <label className="text-dark">Price</label>
 
-                  <Form.Control
-                    onChange={(e) => setPrice(e.target.value)}
-                    size="lg"
-                    required
-                    type="number"
-                    
-                    placeholder="Price in ETH"
-                  />
-                  <div className="d-grid px-0">
-                    <Button onClick={resaleProduct} variant="primary" size="lg">
-                      Resale Product
-                    </Button>
-                  </div>
-                </Row>
+                    <Form.Control
+                      onChange={(e) => setPrice(e.target.value)}
+                      size="lg"
+                      required
+                      type="number"
+
+                      placeholder="Price in ETH"
+                    />
+                    <div className="d-grid px-0">
+                      <Button onClick={resaleProduct} variant="primary" size="lg">
+                        Resale Product
+                      </Button>
+                    </div>
+                  </Row>
                 </Card>
               </div>
             </main>
@@ -249,6 +250,7 @@ const Wrapper = styled.div`
 
 const MainContainer = styled.div`
   flex: 1;
+  overflow-y: scroll;
 `;
 
 export default ProductResold;
